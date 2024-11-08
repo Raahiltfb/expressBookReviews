@@ -50,7 +50,7 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
     }
 
     books[username] = books;
-    res.send('Book with the 
+    res.send('Review updated')
     
 
 module.exports.authenticated = regd_users;
