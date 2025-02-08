@@ -72,22 +72,28 @@ public_users.get('/isbn/:isbn',function (req, res) {
 
 // Get all books based on title
 public_users.get('/title/:title',function (req, res) {
-    let booksbytitle = [];
+     let booksbytitle = [];
     let isbns = Object.keys(books);
     isbns.forEach((isbn) => {
         if(books[isbn]["title"] === req.params.title) {
             booksbytitle.push({"isbn":isbn,
-                               "title":books[isbn]["title"],
+                               "author":books[isbn]["author"],
                                "reviews":books[isbn]["reviews"]});
         }
     });
-    res.send(JSON.stringify({booksbutitle}, null, 4));
+    res.send(JSON.stringify({booksbytitle}, null, 4));
 });
 
 //  Get book review
-public_users.get('/review/:isbn',function (req, res) {
+public_users.get('/review/:isbn', function (req, res) {
     const isbn = req.params.isbn;
-    res.send(books[review]);
+
+    // Check if the book exists
+    if (books[isbn]) {
+        return res.status(200).json({ reviews: books[isbn]["reviews"] });
+    } else {
+        return res.status(404).json({ message: "Book not found" });
+    }
 });
 
 module.exports.general = public_users;
