@@ -96,4 +96,90 @@ public_users.get('/review/:isbn', function (req, res) {
     }
 });
 
+
+// All books using promises
+public_users.get('/', async function (req, res) {
+  try{
+    let bookList = await new Promise((resolve, reject) => {
+      resolve(books);
+    });
+    res.status(200).send(JSON.stringify({books: bookList},null,4));
+
+  } catch (error) {
+    res.status(500).json({ message: "error fetching books"});
+  }
+  
+});
+
+// Book details based on ISBN using promises
+public_users.get('/isbn/:isbn', async function (req, res) {
+  try {
+      const isbn = req.params.isbn;
+      let bookDetails = await new Promise((resolve, reject) => {
+          if (books[isbn]) {
+              resolve(books[isbn]);
+          } else {
+              reject("Book not found");
+          }
+      });
+      res.status(200).json(bookDetails);
+  } catch (error) {
+      res.status(404).json({ message: error });
+  }
+});
+
+// Book details based on Author using promises
+public_users.get('/author/:author', async function (req, res) {
+    try {
+        const author = req.params.author;
+        let result = await new Promise((resolve, reject) => {
+            let filteredbooks = [];
+            for (let bookId in books) {
+                if (books[bookId].author === author) {
+                    filteredbooks.push({
+                        isbn: bookId,
+                        title: books[bookId].title,
+                        reviews: books[bookId].reviews
+                    });
+                }
+            }
+            if (filteredBooks.length > 0) {
+                resolve(filteredBooks);
+            } else {
+                reject("No books by this author found!") 
+            }
+        });
+        res.status(200).json({ booksByAuthor: result });
+    } catch (error) {
+        res.status(404).json({ message: error });
+    }
+});
+
+// Book details based on Title using promises
+public_users.get('title/:title', async function (req, res) {
+    try {
+        const title = req.params.title;
+        let result = await new Promise((resolve, reject) => {
+            let filteredbooks = [];
+            for (let bookId in books) {
+                if (books[bookId].title === title) {
+                    filteredbooks.push({
+                        isbn: bookId,
+                        author: books[bookId].author,
+                        reviews: books[bookId].reviews
+                    });
+                }
+            }
+            if (filteredBooks.length > 0) {
+                resolve(filteredBooks);
+            } else {
+                reject("No books by this title found!")
+            }
+        });
+        res.status(200).json({ booksByTitle: result });
+    } catch (error) {
+        res.status(404).json({ message: error }):
+    }
+});
+
 module.exports.general = public_users;
